@@ -104,4 +104,3 @@ Tài liệu này cung cấp lý thuyết tóm tắt và hướng dẫn thực hi
 2. State Machine: Dùng biến `current_state` và cấu trúc `switch-case`.
 
 ---
-*Chúc bạn ôn tập tốt! Nếu gặp lỗi khi chạy code, hãy copy lỗi đó và hỏi tôi.*
