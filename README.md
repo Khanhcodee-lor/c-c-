@@ -1,47 +1,107 @@
-# 7 Bài C/C++ Cơ Bản Để Bắt Đầu Học Lập Trình Nhúng (Embedded Systems)
+# Lộ Trình Ôn Tập C/C++ Cho Lập Trình Nhúng
 
-Chào mừng bạn đến với lộ trình cơ bản C/C++ dành cho lập trình nhúng. Dưới đây là 7 bài học cốt lõi giúp bạn nắm vững nền tảng trước khi làm việc trực tiếp với phần cứng và vi điều khiển.
+Tài liệu này cung cấp lý thuyết tóm tắt và hướng dẫn thực hiện cho 7 bài tập cốt lõi. Mỗi bài tập tập trung vào một kỹ năng quan trọng trong lập trình hệ thống.
 
-## Bài 1: Kiểu dữ liệu và Thư viện `stdint.h`
-- Hiểu về kích thước bộ nhớ của các kiểu dữ liệu chuẩn (`char`, `int`, `float`) trên các kiến trúc khác nhau.
-- Tầm quan trọng của thư viện `stdint.h` (`uint8_t`, `uint16_t`, `uint32_t`, `int8_t`,...) để đảm bảo tính nhất quán của dữ liệu ở các nền tảng VĐK (8-bit, 16-bit, 32-bit).
-- Ép kiểu (Type casting) an toàn.
+---
 
-## Bài 2: Các Phép Toán Thao Tác Bit (Bitwise Operations)
-- Các toán tử bit: AND (`&`), OR (`|`), XOR (`^`), NOT (`~`), Dịch trái (`<<`), Dịch phải (`>>`).
-- Kỹ thuật thao tác bit cơ bản:
-  - **Set bit**: Bật 1 bit lên mức 1.
-  - **Clear bit**: Xóa 1 bit về mức 0.
-  - **Toggle bit**: Đảo trạng thái 1 bit.
-  - **Read bit / Check bit**: Đọc trạng thái của 1 bit cụ thể.
-- **Ứng dụng:** Thao tác trực tiếp với các thanh ghi (Registers) của vi điều khiển.
+## Bài 1: Kiểu dữ liệu & Thư viện `stdint.h` / `cstdint`
 
-## Bài 3: Con trỏ (Pointers) và Từ khóa `volatile`
-- Bản chất của con trỏ: Lưu trữ địa chỉ bộ nhớ.
-- Truy cập và thay đổi giá trị thông qua con trỏ (Dereferencing).
-- Con trỏ vô kiểu (`void *`) và ép kiểu con trỏ.
-- **Từ khóa `volatile`**: Cực kỳ quan trọng trong Embedded. Báo cho trình biên dịch biết biến này có thể bị thay đổi bởi các yếu tố bên ngoài (như phần cứng, ngắt - ISR) để không tối ưu hóa biến đó.
+### 📘 Lý thuyết
+- **Vấn đề:** Kiểu `int` có thể là 2 byte trên MCU 8-bit nhưng lại là 4 byte trên MCU 32-bit.
+- **Giải pháp:** Dùng `stdint.h` (C) hoặc `cstdint` (C++) để cố định kích thước:
+  - `int8_t` / `uint8_t`: 1 byte (-128..127 / 0..255)
+  - `int16_t` / `uint16_t`: 2 byte
+  - `int32_t` / `uint32_t`: 4 byte
+- **Tràn số (Overflow):** Khi một biến vượt quá giới hạn của nó (ví dụ: `uint8_t` đang là 255, cộng thêm 1 sẽ quay về 0).
 
-## Bài 4: Mảng (Arrays), Chuỗi (Strings) và Quản lý Vùng Nhớ
-- Thao tác an toàn với mảng 1 chiều và chuỗi ký tự (`char array`).
-- Khái niệm về con trỏ và mảng (Pointer arithmetic).
-- Phân biệt các vùng nhớ: **Stack** (biến cục bộ), **Heap** (cấp phát động), **Data** (biến toàn cục/static đã khởi tạo), **BSS** (chưa khởi tạo) và **Text/Flash** (mã lệnh).
-- Lý do tại sao lập trình nhúng (đặc biệt là Bare-metal) thường hạn chế hoặc không dùng cấp phát động (`malloc`/`free`).
+### 💡 Hướng dẫn làm bài
+1. Dùng `scanf("%lld", &n)` (C) hoặc `cin >> n` (C++) để nhập số lớn.
+2. So sánh `n` với các hằng số giới hạn (VD: -128 và 127).
+3. Sử dụng ép kiểu: `(int8_t)n` hoặc `static_cast<int8_t>(n)`.
 
-## Bài 5: Cấu trúc (Struct), Hợp nhất (Union) và Enum
-- **Struct**: Đóng gói các dữ liệu liên quan. 
-  - Khái niệm Memory Alignment và Struct Padding.
-  - Cách dùng `__attribute__((packed))` để tránh lãng phí bộ nhớ khi truyền nhận dữ liệu (ví dụ: bản tin UART, CAN).
-- **Union**: Các biến dùng chung một vùng nhớ. Rất hữu ích khi cần tách/ghép các byte dữ liệu (ví dụ: tách 1 biến 32-bit thành 4 biến 8-bit).
-- **Enum**: Liệt kê các hằng số, giúp code dễ đọc và quản lý trạng thái tốt hơn.
+---
 
-## Bài 6: Tiền xử lý (Preprocessor) và Macros
-- Chỉ thị `#include`, `#define`.
-- Biên dịch có điều kiện: `#ifdef`, `#ifndef`, `#if`, `#endif` (Hữu ích khi viết code hỗ trợ nhiều chip khác nhau).
-- Viết Macros như một hàm (`Function-like macros`). 
-- Ưu/nhược điểm của Macro so với hàm (Inline functions). Các Macro thao tác bit phổ biến (`SET_BIT`, `CLEAR_BIT`).
+## Bài 2: Thao tác Bit (Bitwise Operations)
 
-## Bài 7: Hàm, Con Trỏ Hàm và Máy Trạng Thái (State Machine)
-- Phân biệt truyền tham trị (Pass by value) và truyền tham chiếu/con trỏ (Pass by pointer/reference).
-- **Con trỏ hàm (Function Pointers)**: Cách khai báo và sử dụng. Ứng dụng phổ biến trong việc tạo Callback functions (xử lý sự kiện, ngắt).
-- **Máy trạng thái hữu hạn (FSM - Finite State Machine)**: Cách tư duy và thiết kế chương trình C theo dạng non-blocking (không dùng `delay()` làm treo hệ thống) để xử lý nhiều tác vụ cùng lúc trên VĐK.
+### 📘 Lý thuyết
+- **Mặt nạ (Mask):** `(1 << n)` tạo ra một số có bit thứ `n` bằng 1.
+- **Các phép toán:**
+  - **Set bit:** `REG |= (1 << n)` (Dùng OR với 1).
+  - **Clear bit:** `REG &= ~(1 << n)` (Dùng AND với 0).
+  - **Toggle bit:** `REG ^= (1 << n)` (Dùng XOR với 1).
+  - **Read bit:** `(REG >> n) & 1`.
+
+### 💡 Hướng dẫn làm bài
+1. In số Hex: `printf("0x%X", n)` hoặc `cout << hex << uppercase << n`.
+2. Phép XOR không dùng `^`: Sử dụng công thức logic `(A & ~B) | (~A & B)`.
+
+---
+
+## Bài 3: Con trỏ (Pointers) & Volatile
+
+### 📘 Lý thuyết
+- **Con trỏ:** Lưu địa chỉ. `*p` để lấy giá trị tại địa chỉ đó.
+- **Hoán vị:** Phải truyền địa chỉ (`&a`, `&b`) vào hàm để thay đổi giá trị gốc.
+- **Truy cập byte:** Ép kiểu địa chỉ bất kỳ sang `uint8_t*` để đọc từng byte một.
+- **Volatile:** Báo trình biên dịch "đừng tối ưu biến này". Thường dùng cho biến thay đổi bởi phần cứng hoặc ngắt.
+
+### 💡 Hướng dẫn làm bài
+1. Hàm swap: `void swap(int *a, int *b) { int temp = *a; *a = *b; *b = temp; }`.
+2. Đọc byte của float: `uint8_t *ptr = (uint8_t *)&f;` sau đó dùng vòng lặp 4 lần.
+
+---
+
+## Bài 4: Mảng & Chuỗi (Arrays & Strings)
+
+### 📘 Lý thuyết
+- **Mảng & Con trỏ:** `arr[i]` tương đương với `*(arr + i)`.
+- **Đảo ngược mảng:** Dùng 2 con trỏ (một ở đầu, một ở cuối) đổi chỗ cho nhau dần vào giữa.
+- **Chuỗi trong C:** Là mảng `char` kết thúc bằng ký tự `\0`.
+
+### 💡 Hướng dẫn làm bài
+1. Duyệt mảng bằng con trỏ: `for (int *p = arr; p < arr + n; p++)`.
+2. Nối chuỗi: Tìm vị trí `\0` của chuỗi 1, sau đó copy từng ký tự chuỗi 2 vào.
+
+---
+
+## Bài 5: Struct, Union & Enum
+
+### 📘 Lý thuyết
+- **Struct:** Các phần tử nằm ở các địa chỉ khác nhau. Kích thước = tổng các phần tử + padding (để căn lề bộ nhớ).
+- **Union:** Tất cả phần tử dùng chung **một** địa chỉ. Kích thước = phần tử lớn nhất.
+- **Enum:** Định nghĩa các hằng số có tên giúp code dễ đọc.
+
+### 💡 Hướng dẫn làm bài
+1. Dùng Union để tách số 32-bit:
+   ```c
+   union { uint32_t value; uint8_t bytes[4]; } data;
+   ```
+2. Nhập `data.value`, sau đó in `data.bytes[0]`...`data.bytes[3]`.
+
+---
+
+## Bài 6: Tiền xử lý (Preprocessor) & Macros
+
+### 📘 Lý thuyết
+- **Macro:** Là thay thế văn bản trước khi biên dịch.
+- **An toàn Macro:** Luôn dùng ngoặc đơn bao quanh tham số: `#define SQUARE(x) ((x) * (x))`.
+- **Biên dịch điều kiện:** Dùng để bật/tắt tính năng hoặc hỗ trợ nhiều dòng chip khác nhau.
+
+### 💡 Hướng dẫn làm bài
+1. Viết `SET_BIT(reg, bit)` tương tự bài 2 nhưng dùng tham số.
+2. Kiểm tra `#ifdef DEBUG` để in log.
+
+---
+
+## Bài 7: Con trỏ hàm & State Machine
+
+### 📘 Lý thuyết
+- **Con trỏ hàm:** Lưu địa chỉ của một hàm để gọi gián tiếp. Cú pháp: `void (*func_ptr)(int, int)`.
+- **State Machine:** Hệ thống chuyển đổi giữa các trạng thái dựa trên sự kiện. Giúp quản lý logic phức tạp (như điều khiển thang máy, cửa tự động).
+
+### 💡 Hướng dẫn làm bài
+1. Mảng con trỏ hàm: `int (*math_funcs[])(int, int) = {add, sub, mul, div};`.
+2. State Machine: Dùng biến `current_state` và cấu trúc `switch-case`.
+
+---
+*Chúc bạn ôn tập tốt! Nếu gặp lỗi khi chạy code, hãy copy lỗi đó và hỏi tôi.*
